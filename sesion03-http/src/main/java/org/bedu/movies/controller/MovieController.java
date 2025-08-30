@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bedu.movies.model.Movie;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,11 +55,18 @@ public class MovieController {
     }
 
     // Crear una nueva pelicula
+    // Parte de las buenas prácticas es regresar el elemento creado
+    @RequestMapping("createMovie")
+    public Movie createMovie(@RequestBody Movie newMovie) {
+        newMovie.setId(db.size() + 1); // Asignando un nuevo ID
+        db.add(newMovie); // Agregamos la nueva película a la "base de datos"
+        return newMovie;
+    }
 
     /*
      * Un backend puede recibir parámetros de 4 maneras diferentes.
      * 
-     * 1. Querystring (@RequestParam)
+     * 1. Querystring (@RequestParam) --------------------------------------------
      * 
      * Son parámetros proporcionados al final de la URL. Los parámetros son opcionales
      * pero a través del código se pueden volver obligatorios.
@@ -75,7 +83,7 @@ public class MovieController {
      * 1. La URL tiene un tamaño máximo (2000 caracteres)
      * 2. Los parámetros son opcionales (en general)
      * 
-     * 2. Variable en la URL/Path (@PathVariable)
+     * 2. Variable en la URL/Path (@PathVariable) --------------------------------------------
      * 
      * Los paths pueden tener variables y son obligatorios.
      * 
@@ -83,5 +91,12 @@ public class MovieController {
      * 
      * Desventaja:
      * 1. La URL tiene un tamaño máximo
+     * 
+     * 3. Cuerpo de la petición (@RequestBody) --------------------------------------------
+     * 
+     * Son los datos que no se pueden enviar por URL. Se pueden enviar en cualquier formato
+     * (depende del backend cómo interpretarlos) y no hay un límite en el tamaño.
+     * 
+     * Nota: Para poder obtenerlo en el código, es necesario tener una clase que lo represente.
      */
 }
