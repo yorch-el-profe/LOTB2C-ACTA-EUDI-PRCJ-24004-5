@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bedu.movies.model.Movie;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +17,7 @@ public class MovieController {
     public MovieController() {
         Movie superman = new Movie();
 
+        superman.setId(1);
         superman.setTitle("Superman");
         superman.setDirector("James Gunn");
         superman.setYear(2025);
@@ -35,7 +37,51 @@ public class MovieController {
         return db;
     }
 
-    // Obtener una sola pelicula
+    // Obtener una sola pelicula por su ID
+    // URL: localhost:8080/getMovieById/30
+    @RequestMapping("getMovieById/{id}")
+    public Movie getMovieById(@PathVariable("id") int id) {
+
+        for (int i = 0; i < db.size(); i++) {
+            Movie movie = db.get(i); // Obtiene la película en la posición i
+
+            if (movie.getId() == id) { // Es la película que estamos buscando
+                return movie; // Enviando la película encontrada
+            }   
+        }
+
+        return null;// Es cuando NO encontró una película
+    }
 
     // Crear una nueva pelicula
+
+    /*
+     * Un backend puede recibir parámetros de 4 maneras diferentes.
+     * 
+     * 1. Querystring (@RequestParam)
+     * 
+     * Son parámetros proporcionados al final de la URL. Los parámetros son opcionales
+     * pero a través del código se pueden volver obligatorios.
+     * 
+     * url_backend/endpoint ? key=value & key2=value2 & key3=value3 ...
+     * 
+     * Por ejemplo:
+     * 
+     * url_backend/endpoint ? nombre=Jorge & puesto=Desarrollador & edad=32
+     * 
+     * url_backend/endpoint ? id=10
+     * 
+     * Desventaja: 
+     * 1. La URL tiene un tamaño máximo (2000 caracteres)
+     * 2. Los parámetros son opcionales (en general)
+     * 
+     * 2. Variable en la URL/Path (@PathVariable)
+     * 
+     * Los paths pueden tener variables y son obligatorios.
+     * 
+     * url_backend/endpoint/{param}/other  <- es una varible
+     * 
+     * Desventaja:
+     * 1. La URL tiene un tamaño máximo
+     */
 }

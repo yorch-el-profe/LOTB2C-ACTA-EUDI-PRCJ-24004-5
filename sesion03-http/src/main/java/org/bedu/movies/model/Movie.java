@@ -11,9 +11,18 @@ package org.bedu.movies.model;
 
 public class Movie {
     
+    private int id;
     private String title;
     private String director;
     private int year;
+    
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
     
     public String getTitle() {
         return title;
