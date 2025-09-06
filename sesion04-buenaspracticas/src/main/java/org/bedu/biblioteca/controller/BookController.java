@@ -4,11 +4,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bedu.biblioteca.model.Book;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("books") // Todos los endpoints tendrán el prefijo /books
@@ -81,6 +86,22 @@ public class BookController {
      * 
      *  GET /authors?book=908248923
      *  GET /alumnos?modulo=78423&curso=234786
+     * 
+     * 8. Deben usarse adecuadamente los códigos de respuesta de HTTP.
+     * 
+     *  Códigos de éxito
+     *  - 200 (Ok): Todo bien
+     *  - 201 (Created): Todo bien y se creó información
+     *  - 204 (No Content):Todo bien pero no hay respuesta adicional
+     * 
+     *  Códigos de error
+     *  - 400 (Bad Request): La información proporcionada es incorrecta/invalida
+     *  o se provoca un error por culpa del usuario.
+     *  - 401 (Acceso denagado): No se tiene acceso al recurso solicitado
+     *  - 404 (Not Found): No se encontró la información buscada
+     *  - 500 (Internal Server Error): Ocurrió un error inesperado
+     * 
+     *  Por defecto en Spring, todas las respuestas son 200/Ok (excepto en los errores)
      */
     
     // Obtener todos los libros
@@ -91,25 +112,80 @@ public class BookController {
 
     // Obtener un libro por ISBN
     @GetMapping("{isbn}") // books/{isbn}
-    public void getBookByISBN() {
+    public Book getBookByISBN(@PathVariable("isbn") String isbn) {
+        // Imperativo
+        for (Book book : db) {
+            if (book.getIsbn().equals(isbn)) {
+                return book;
+            }
+        }
 
+        // Funcional
+        // return db.stream().filter(x -> x.getIsbn().equals(isbn)).findFirst();
+
+        return null;
     }
 
     // Crear un nuevo libro
     @PostMapping
-    public void createBook() {
-
+    @ResponseStatus(HttpStatus.CREATED)
+    public Book createBook(@RequestBody Book newBook) {
+        db.add(newBook);
+        return newBook;
     }
 
     // Editar un libro
-    @PutMapping
-    public void updateBook() {
+    @PutMapping("{isbn}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateBook(@PathVariable("isbn") String isbn,
+        @RequestBody Book updatedBook) throws Exception {
 
+        Book oldBook = null;
+
+        for (Book book : db) {
+            if (book.getIsbn().equals(isbn)) {
+                oldBook = book;
+                break;
+            }
+        }
+
+        // Si no encuentra el libro entonces regresa un error
+        if (oldBook == null) {
+            throw new Exception();
+        }
+
+        if (updatedBook.getIsbn() != null) {
+            oldBook.setIsbn(updatedBook.getIsbn());
+        }
+
+        if (updatedBook.getTitle() != null) {
+            oldBook.setTitle(updatedBook.getTitle());
+        }
+
+        if (updatedBook.getAuthor() != null) {
+            oldBook.setAuthor(updatedBook.getAuthor());
+        }
+
+        if (updatedBook.getYear() != 0) {
+            oldBook.setYear(updatedBook.getYear());
+        }
     }
 
     // Eliminar un libro
-    @DeleteMapping
-    public void deleteBook() {
-        
+    @DeleteMapping("{isbn}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteBook(@PathVariable("isbn") String isbn) {
+        // Imperativa
+        for (int i = 0; i < db.size(); i++) {
+            Book book = db.get(i);
+
+            if (book.getIsbn().equals(isbn)) {
+                db.remove(i);
+                return;
+            }
+        }
+
+        // Funcional
+        // db.removeIf(x -> x.getIsbn().equals(isbn));
     }
 }
