@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bedu.biblioteca.model.Book;
+import org.bedu.biblioteca.service.BookService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class BookController {
 
-    private List<Book> db = new LinkedList<>();
+    @Autowired
+    private BookService service;
 
     // CRUD: Create, Read, Update, Delete
     // Exponer endpoints para manipular datos
@@ -107,85 +109,34 @@ public class BookController {
     // Obtener todos los libros
     @GetMapping
     public List<Book> getBooks() {
-        return db;
+        return service.getAll();
     }
 
     // Obtener un libro por ISBN
     @GetMapping("{isbn}") // books/{isbn}
     public Book getBookByISBN(@PathVariable("isbn") String isbn) {
-        // Imperativo
-        for (Book book : db) {
-            if (book.getIsbn().equals(isbn)) {
-                return book;
-            }
-        }
-
-        // Funcional
-        // return db.stream().filter(x -> x.getIsbn().equals(isbn)).findFirst();
-
-        return null;
+        return service.getByISBN(isbn);
     }
 
     // Crear un nuevo libro
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Book createBook(@RequestBody Book newBook) {
-        db.add(newBook);
-        return newBook;
+    public Book createBook(@RequestBody Book newBook) throws Exception {
+        return service.add(newBook);
     }
-
+ 
     // Editar un libro
     @PutMapping("{isbn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateBook(@PathVariable("isbn") String isbn,
         @RequestBody Book updatedBook) throws Exception {
-
-        Book oldBook = null;
-
-        for (Book book : db) {
-            if (book.getIsbn().equals(isbn)) {
-                oldBook = book;
-                break;
-            }
-        }
-
-        // Si no encuentra el libro entonces regresa un error
-        if (oldBook == null) {
-            throw new Exception();
-        }
-
-        if (updatedBook.getIsbn() != null) {
-            oldBook.setIsbn(updatedBook.getIsbn());
-        }
-
-        if (updatedBook.getTitle() != null) {
-            oldBook.setTitle(updatedBook.getTitle());
-        }
-
-        if (updatedBook.getAuthor() != null) {
-            oldBook.setAuthor(updatedBook.getAuthor());
-        }
-
-        if (updatedBook.getYear() != 0) {
-            oldBook.setYear(updatedBook.getYear());
-        }
+            service.update(isbn, updatedBook);
     }
 
     // Eliminar un libro
     @DeleteMapping("{isbn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBook(@PathVariable("isbn") String isbn) {
-        // Imperativa
-        for (int i = 0; i < db.size(); i++) {
-            Book book = db.get(i);
-
-            if (book.getIsbn().equals(isbn)) {
-                db.remove(i);
-                return;
-            }
-        }
-
-        // Funcional
-        // db.removeIf(x -> x.getIsbn().equals(isbn));
+        service.delete(isbn);
     }
 }
