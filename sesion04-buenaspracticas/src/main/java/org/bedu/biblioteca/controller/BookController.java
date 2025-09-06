@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@RequestMapping("books") // Todos los endpoints tendrán el prefijo /books
+@RestController
 public class BookController {
 
     private List<Book> db = new LinkedList<>();
@@ -81,27 +84,31 @@ public class BookController {
      */
     
     // Obtener todos los libros
-    @GetMapping("books")
+    @GetMapping
     public List<Book> getBooks() {
         return db;
     }
 
     // Obtener un libro por ISBN
+    @GetMapping("{isbn}") // books/{isbn}
+    public void getBookByISBN() {
+
+    }
 
     // Crear un nuevo libro
-    @PostMapping("books")
+    @PostMapping
     public void createBook() {
 
     }
 
     // Editar un libro
-    @PutMapping("books")
+    @PutMapping
     public void updateBook() {
 
     }
 
     // Eliminar un libro
-    @DeleteMapping("books")
+    @DeleteMapping
     public void deleteBook() {
         
     }
