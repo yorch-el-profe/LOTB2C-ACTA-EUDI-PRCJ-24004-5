@@ -23,7 +23,7 @@ public class BookController {
      * 
      * Representational State Transfer
      * 
-     * 1. REST no es un estandard, es un ESTILO de arquitectura
+     * 1. REST no es un estandar, es un ESTILO de arquitectura
      * y una RECOMENDACIÓN de buenas prácticas.
      * 
      * 2. REGLA DE ORO: REST se trata de que NO HAY ESTADO. Cada petición 
@@ -46,12 +46,42 @@ public class BookController {
      *  - @PutMapping
      *  - @DeleteMapping
      * 
-     *   
+     * 4. La transferencia de información es utilizando JSON o XML (ya nadie usa XML).
      * 
+     * 5. El querystring se utiliza para filtrar información, por ejemplo
+     * 
+     *  GET /perros?nombre=Firulais: Filtra todos perros que se llaman Firulais
+     *  GET /productos?categoria=eletrodomesticos&precio=5000
+     * 
+     * Para crear/actualizar información se utiliza el BODY, y los ID's se mandan
+     * através de la URL.
+     * 
+     * GET /doctores/89657: Obtiene la información del doctor con ID 89657
+     * 
+     * 6. Para el nombrado de los endpoints se utilizan sustantivos (en plural) y no verbos.
+     * 
+     * getBooks -> books
+     * createCar -> cars
+     * updateDog -> dogs
+     * 
+     * getProduct ->    GET /products
+     * createProduct -> POST /products
+     * updateProduct -> PUT /products
+     * deleteProduct -> DELETE /products
+     * 
+     * 7. Reflejar la jerarquía de la información a través de la URL.
+     * 
+     *  GET /cursos/89034/modulos/233434/alumnos: Obtiene todos los alumnos del módulo 233434
+     *  para el curso 89034
+     * 
+     *  GET /books/908248923/authors: Obtiene todos los autores del libro 908248923
+     * 
+     *  GET /authors?book=908248923
+     *  GET /alumnos?modulo=78423&curso=234786
      */
     
     // Obtener todos los libros
-    @GetMapping("getBooks")
+    @GetMapping("books")
     public List<Book> getBooks() {
         return db;
     }
@@ -59,19 +89,19 @@ public class BookController {
     // Obtener un libro por ISBN
 
     // Crear un nuevo libro
-    @PostMapping("createBook")
+    @PostMapping("books")
     public void createBook() {
 
     }
 
     // Editar un libro
-    @PutMapping("updateBook")
+    @PutMapping("books")
     public void updateBook() {
 
     }
 
     // Eliminar un libro
-    @DeleteMapping("deleteBook")
+    @DeleteMapping("books")
     public void deleteBook() {
         
     }
