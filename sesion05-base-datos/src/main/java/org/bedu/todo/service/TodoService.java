@@ -47,4 +47,8 @@ public class TodoService {
         // DELETE FROM todos WHERE id = :id
         repository.deleteById(id);
     }
+
+    public List<Todo> filterByDescription(String q) {
+        return repository.findByDescriptionWithSQL(q);
+    }
 }

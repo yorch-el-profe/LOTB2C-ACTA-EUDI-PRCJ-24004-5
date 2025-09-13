@@ -26,10 +26,10 @@ public class Todo {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
+    @Column
     // @ColumnDefault agrega un valor por defecto a la columna
     @ColumnDefault("false")
-    private Boolean isCompleted;
+    private boolean isCompleted;
 
     public Integer getId() {
         return id;

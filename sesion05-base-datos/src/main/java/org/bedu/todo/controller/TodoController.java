@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,8 +25,15 @@ public class TodoController {
     private TodoService service;
     
     @GetMapping
-    public List<Todo> findAll() {
-        return service.findAll();
+    public List<Todo> findAll(
+        @RequestParam(name = "q", required = false) String q) {
+            if (q != null) {
+                // Buscar todos las tareas que tengan por nombre "q"
+                return service.filterByDescription(q);
+            } else {
+                return service.findAll();
+            }
+        
     }
 
     @PostMapping
