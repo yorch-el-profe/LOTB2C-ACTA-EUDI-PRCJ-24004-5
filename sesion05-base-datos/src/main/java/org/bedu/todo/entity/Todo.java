@@ -29,7 +29,7 @@ public class Todo {
     @Column
     // @ColumnDefault agrega un valor por defecto a la columna
     @ColumnDefault("false")
-    private boolean isCompleted;
+    private boolean completed;
 
     public Integer getId() {
         return id;
@@ -44,9 +44,9 @@ public class Todo {
         this.description = description;
     }
     public Boolean isCompleted() {
-        return isCompleted;
+        return completed;
     }
-    public void setCompleted(Boolean isCompleted) {
-        this.isCompleted = isCompleted;
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
     }
 }
