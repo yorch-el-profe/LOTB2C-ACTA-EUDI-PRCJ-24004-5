@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 function App() {
   // Referencia del <input/>
@@ -7,23 +7,72 @@ function App() {
   // Lista de todos
   const [todos, setTodos] = useState([]);
 
-  function createTodo(event) {
+  // Cuando cargue el compente, llamamos al backend
+  useEffect(() => {
+
+    async function findAll() {
+      try {
+        // Hacemos la petición y recibimos respuesta
+        const response = await fetch("http://localhost:8080/todos");
+
+        // Extraemos el JSON de la respuesta
+        const data = await response.json();
+
+        setTodos(data); // Alimentando el estado con lo que viene del backend
+      } catch (err) {
+        alert("Ocurrió un error: " + err.message);
+      }
+    }
+
+    findAll();
+
+  }, []);
+
+  async function createTodo(event) {
     event.preventDefault();
 
     const description = todoInput.current.value.trim();
 
     if (description) {
-      setTodos([{ description, completed: false }, ...todos]);
+      // En fetch, el request body tiene que ir en un string
+      // En headers.Content-Type especificamos que es un JSON
+      try {
+        const response = await fetch("http://localhost:8080/todos", {
+          method: "POST",
+          body: JSON.stringify({ description }),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        const data = await response.json();
+
+        setTodos([ ...todos, data ]);
+      } catch (err) {
+        alert("Ocurrió un error: " + err.message);
+      }      
     }
 
     todoInput.current.value = "";
   }
 
-  function completeTodo(index) {
-    return function (event) {
-      const todo = todos[index];
-      todo.completed = event.target.checked;
-      setTodos([ ...todos ]);
+  function completeTodo(id) {
+    return async function () {
+      try {
+        // Fetch por defecto hace peticiones GET
+        // a menos de que se especifique lo contrario
+        const response = await fetch("http://localhost:8080/todos/" + id, {
+          method: "PUT"
+        });
+
+        if (response.ok) {
+          const todo = todos.find(t => t.id === id);
+          todo.completed = !todo.completed;
+          setTodos([ ...todos ]);
+        }
+      } catch (err) {
+        alert("Ocurrió un error: " + err.message);
+      }
     }
   }
 
@@ -44,7 +93,7 @@ function App() {
                     <p className={ todo.completed ? "card-text text-decoration-line-through" : "card-text" }>{todo.description}</p>
                     <div className="row justify-content-between px-2">
                       <div className="form-check col-6">
-                        <input className="form-check-input" type="checkbox" id="checkDefault" checked={todo.completed} onChange={completeTodo(index)} />
+                        <input className="form-check-input" type="checkbox" id="checkDefault" checked={todo.completed} onChange={completeTodo(todo.id)} />
                         <label className="form-check-label" htmlFor="checkDefault">
                           { todo.completed ? 'Cancelar' : 'Completar'}
                         </label>
