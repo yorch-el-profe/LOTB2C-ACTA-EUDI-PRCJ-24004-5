@@ -59,4 +59,7 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
      */
     @NativeQuery("SELECT * FROM todos WHERE description ILIKE %?1%")
     List<Todo> findByDescriptionWithSQL(String q);
+
+    // Buscando los Todos por ID de usuario
+    List<Todo> findByUser_Id(Integer id);
 }

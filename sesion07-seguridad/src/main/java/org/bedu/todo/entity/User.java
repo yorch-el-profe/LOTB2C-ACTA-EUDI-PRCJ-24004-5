@@ -26,16 +26,16 @@ public class User {
 
     // Nota: En la mayoría de los casos el OneToMany no es necesario
     // únicamente el ManyToOne
-    @OneToMany(mappedBy = "user")
-    private List<Todo> todos;
+    // @OneToMany(mappedBy = "user")
+    // private List<Todo> todos;
 
-    public List<Todo> getTodos() {
+    /*public List<Todo> getTodos() {
         return todos;
     }
 
     public void setTodos(List<Todo> todos) {
         this.todos = todos;
-    }
+    }*/
 
     public Integer getId() {
         return id;

@@ -6,6 +6,8 @@ import org.bedu.todo.entity.Todo;
 import org.bedu.todo.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,20 +30,20 @@ public class TodoController {
     
     @GetMapping
     public List<Todo> findAll(
-        @RequestParam(name = "q", required = false) String q) {
+        @RequestParam(name = "q", required = false) String q, @AuthenticationPrincipal UserDetails user) {
             if (q != null) {
                 // Buscar todos las tareas que tengan por nombre "q"
                 return service.filterByDescription(q);
             } else {
-                return service.findAll();
+                return service.findAll(user.getUsername());
             }
         
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Todo save(@RequestBody Todo todo) {
-        return service.save(todo);
+    public Todo save(@RequestBody Todo todo, @AuthenticationPrincipal UserDetails user) {
+        return service.save(user.getUsername(), todo);
     }
 
     @PutMapping("{id}")
