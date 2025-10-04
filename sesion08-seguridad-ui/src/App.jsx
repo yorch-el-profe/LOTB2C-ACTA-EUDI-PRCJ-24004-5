@@ -15,10 +15,12 @@ function App() {
         // Hacemos la petición y recibimos respuesta
         const response = await fetch("http://localhost:8080/todos");
 
-        // Extraemos el JSON de la respuesta
-        const data = await response.json();
+        console.log(response);
 
-        setTodos(data); // Alimentando el estado con lo que viene del backend
+        // Extraemos el JSON de la respuesta
+        //const data = await response.json();
+
+        //setTodos(data); // Alimentando el estado con lo que viene del backend
       } catch (err) {
         alert("Ocurrió un error: " + err.message);
       }
