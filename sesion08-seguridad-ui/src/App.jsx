@@ -1,4 +1,26 @@
 import { useRef, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router';
+
+function useFetch(navigate) {
+ return async function (url, params) {
+  const token = localStorage.getItem("$token");
+
+  const response = await fetch(url, {
+    ...params,
+    headers: {
+      ...params?.headers,
+      'Authorization': 'Bearer ' + token // Usando el token en la petición
+    }
+  });
+
+  if (response.status === 403) {
+    navigate("/login")
+    throw new Error("Su sesión ha expirado, inicie sesión nuevamente");
+  }
+
+  return response;
+ }
+}
 
 function App() {
   // Referencia del <input/>
@@ -7,20 +29,26 @@ function App() {
   // Lista de todos
   const [todos, setTodos] = useState([]);
 
+  const navigate = useNavigate();
+  const fetchWithAuth = useFetch(navigate);
+
+  function logout() {
+    localStorage.removeItem("$token");
+    navigate("/login");
+  }
+
   // Cuando cargue el compente, llamamos al backend
   useEffect(() => {
 
     async function findAll() {
       try {
         // Hacemos la petición y recibimos respuesta
-        const response = await fetch("http://localhost:8080/todos");
-
-        console.log(response);
+        const response = await fetchWithAuth("http://localhost:8080/todos");
 
         // Extraemos el JSON de la respuesta
-        //const data = await response.json();
+        const data = await response.json();
 
-        //setTodos(data); // Alimentando el estado con lo que viene del backend
+        setTodos(data); // Alimentando el estado con lo que viene del backend
       } catch (err) {
         alert("Ocurrió un error: " + err.message);
       }
@@ -39,7 +67,7 @@ function App() {
       // En fetch, el request body tiene que ir en un string
       // En headers.Content-Type especificamos que es un JSON
       try {
-        const response = await fetch("http://localhost:8080/todos", {
+        const response = await fetchWithAuth("http://localhost:8080/todos", {
           method: "POST",
           body: JSON.stringify({ description }),
           headers: {
@@ -63,7 +91,7 @@ function App() {
       try {
         // Fetch por defecto hace peticiones GET
         // a menos de que se especifique lo contrario
-        const response = await fetch("http://localhost:8080/todos/" + id, {
+        const response = await fetchWithAuth("http://localhost:8080/todos/" + id, {
           method: "PUT"
         });
 
@@ -79,8 +107,23 @@ function App() {
   }
 
   return (
-    <div className="vh-100 vw-100 p-5">
-      <div className="container justify-content-center">
+    <div className="vh-100 vw-100">
+      <nav className="navbar bg-dark navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+        <div className="container-fluid">
+          <a className="navbar-brand" href="#">TODO APP</a>
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div className="collapse navbar-collapse" id="navbarNav">
+            <ul className="navbar-nav">
+              <li className="nav-item">
+                <a className="nav-link" href="#" onClick={logout}>Cerrar sesión</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <div className="container p-5 justify-content-center">
         <div className="input-group mb-3">
           <input type="text" className="form-control" ref={todoInput} />
           <button className="btn btn-primary" type="button" onClick={createTodo}>Agregar</button>
